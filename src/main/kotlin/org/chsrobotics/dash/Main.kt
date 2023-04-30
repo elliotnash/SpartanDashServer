@@ -74,14 +74,25 @@ fun main(args: Array<String>) {
         selector.place(0, 0)
     }
 
-    selector.selected = "curvature"
+    // selector.selected = "curvature"
 
 //
 //    selector.options = selector.options + ("mixed" to "Mixed Curvature")
 //
     runBlocking {
+//        while (true) {
+//            delay(1000)
+//        }
         while (true) {
-            delay(1000)
+            val input = readlnOrNull()?.toIntOrNull()
+            println("GOT INPUT: $input")
+            if (input != null) {
+                if (input == 1) {
+                    selector.selected = "arcade"
+                } else if (input == 2) {
+                    selector.selected = "curvature"
+                }
+            }
         }
     }
 }

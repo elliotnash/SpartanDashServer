@@ -75,16 +75,25 @@ private class DashServer {
 
     private val connections: MutableSet<Connection> = Collections.synchronizedSet(LinkedHashSet())
 
+    suspend fun broadcastEvents(events: List<DashEvent>) {
+        for (connection in connections) {
+            connection.session.sendSerialized(events)
+        }
+    }
+
+    suspend fun broadcastEvent(event: DashEvent) {
+        broadcastEvents(listOf(event))
+    }
+
     private fun Routing.spartanRoutes() {
         get("/ping") {
             call.respondText { "Pong!" }
         }
         webSocket("/ws") {
-            println("Adding user!")
+            println("New client connected!")
             val thisConnection = Connection(this)
             connections += thisConnection
             try {
-                send("You are connected! There are ${connections.count()} users here.")
                 sendSerialized(SpartanDash.widgetModels.values.map { WidgetEvent(it.current)} as List<DashEvent>)
 
                 while(true) {
@@ -153,12 +162,17 @@ class SpartanDash(
 
         private suspend fun eventLoop() {
             while (true) {
+                val events = mutableListOf<DashEvent>()
                 for (updater in widgetModels.values) {
                     updater.ifUpdated { next, _ ->
                         println("WE UPDATED: ${json.encodeToString(next)}")
+                        events.add(WidgetEvent(next))
                     }
                 }
-                delay(1000.milliseconds)
+                if (events.size > 0) {
+                    server.broadcastEvents(events)
+                }
+                delay(20.milliseconds)
             }
         }
     }
