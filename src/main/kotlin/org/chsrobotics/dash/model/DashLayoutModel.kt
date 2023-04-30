@@ -2,6 +2,7 @@ package org.chsrobotics.dash.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.chsrobotics.dash.layout.SplitWidgetPosition
 
 @Serializable
 @SerialName("layout")
@@ -13,7 +14,7 @@ data class DashLayoutEvent(
 data class DashLayoutModel(
     val columns: Int,
     val rows: Int,
-    val widgets: List<WidgetPlacementModel>
+    val widgets: List<WidgetPlacementModel> = listOf()
 )
 
 @Serializable
@@ -39,13 +40,5 @@ data class SplitWidgetPlacementModel(
     override val widgetUuid: String,
     override val column: Int,
     override val row: Int,
-    val position: Position
-) : WidgetPlacementModel() {
-    @Serializable
-    enum class Position {
-        @SerialName("top")
-        TOP,
-        @SerialName("bottom")
-        BOTTOM
-    }
-}
+    val position: SplitWidgetPosition
+) : WidgetPlacementModel()
